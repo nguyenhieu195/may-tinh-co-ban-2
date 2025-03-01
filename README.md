@@ -1,9 +1,7 @@
 Tôi sẽ tạo một file README.md chi tiết cho dự án máy tính của bạn:
 
 ```markdown
-# Modern Calculator
-
-![Calculator Preview](/screenshots/calculator-preview.png)
+<img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/A%CC%89nh%20ma%CC%80n%20hi%CC%80nh%202025-03-02%20lu%CC%81c%2003.40.06-iCcpNSo1QwAmCfIjS3nUbCJlVX809i.png" alt="Calculator Main" width="320"/>
 
 Một ứng dụng máy tính hiện đại được xây dựng bằng Java Swing, với giao diện người dùng đẹp mắt và các tính năng toán học nâng cao.
 
