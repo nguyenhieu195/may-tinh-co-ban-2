@@ -93,23 +93,14 @@ public static final Color BUTTON_OPERATOR = new Color(255, 159, 10);
 
 Bạn có thể thay đổi các giá trị màu để tùy chỉnh giao diện theo ý muốn.
 
-## 🤝 Đóng góp
-
-Nếu bạn muốn đóng góp cho dự án:
-
-1. Fork dự án
-2. Tạo nhánh mới (`git checkout -b feature/AmazingFeature`)
-3. Commit thay đổi (`git commit -m 'Add some AmazingFeature'`)
-4. Push lên nhánh (`git push origin feature/AmazingFeature`)
-5. Mở Pull Request
-
 
 ## 📝 Ghi chú
 
 - Ứng dụng sử dụng Java Swing cho giao diện người dùng
 - Các phép tính được thực hiện với độ chính xác cao
 - Hỗ trợ hiển thị số thập phân tới 8 chữ số
-
+-```javac -d out src/com/calculator/**/*.java```
+-```java -cp out com.calculator.Main```
 
 ## 🔑 Phím tắt
 
