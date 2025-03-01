@@ -125,7 +125,7 @@ Dự án này được phân phối dưới giấy phép MIT. Xem file `LICENSE`
 ## 👥 Tác giả
 
 - Tên của bạn
-- Profile: truongdat.glitch.me
+- Profile: [@truongdat](https://truongdat.glitch.me)
 
 
 ## 🙏 Cảm ơn
