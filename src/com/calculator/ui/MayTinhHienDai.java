@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
+import com.calculator.ui.components.ThanhLichSu;
 
 /**
  * Lớp chính của ứng dụng máy tính

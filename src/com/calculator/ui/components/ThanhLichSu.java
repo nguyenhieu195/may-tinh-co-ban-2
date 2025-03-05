@@ -1,12 +1,12 @@
 package com.calculator.ui.components;
 
 import com.calculator.constants.MauSac;
-import javax.swing.*;
-import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.border.*;
 
 public class ThanhLichSu extends JPanel {
     private JTextArea historyArea;
@@ -143,9 +143,21 @@ public class ThanhLichSu extends JPanel {
         };
     }
     
+    /**
+     * Thêm một phép tính vào lịch sử
+     * @param calculation Phép tính cần thêm vào lịch sử
+     */
     public void addToHistory(String calculation) {
         history.add(calculation);
         updateHistoryArea();
+    }
+    
+    /**
+     * Phương thức bổ sung để tương thích với MayTinhHienDai.java
+     * @param calculation Phép tính cần thêm vào lịch sử
+     */
+    public void themLichSu(String calculation) {
+        addToHistory(calculation);
     }
     
     private void updateHistoryArea() {
