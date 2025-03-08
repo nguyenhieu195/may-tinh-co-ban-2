@@ -3,11 +3,11 @@ package com.calculator;
 import com.calculator.components.*;
 import com.calculator.constants.*;
 import com.calculator.utils.*;
+import com.calculator.ui.components.ThanhLichSu;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
-import com.calculator.ui.components.ThanhLichSu;
 
 /**
  * Lớp chính của ứng dụng máy tính
@@ -25,6 +25,7 @@ public class MayTinhHienDai extends JFrame {
     private boolean batDauNhapMoi;       // Đánh dấu bắt đầu nhập số mới
     private boolean dangNhapPhanSo;      // Đánh dấu đang nhập phân số
     private boolean dangNhapCanBacHai;   // Đánh dấu đang nhập căn bậc hai
+    private boolean ketQuaLaCanBacHai;   // Đánh dấu kết quả là căn bậc hai
 
     /**
      * Constructor khởi tạo máy tính
@@ -35,6 +36,7 @@ public class MayTinhHienDai extends JFrame {
         ketQua = 0;
         phepToanCuoi = "";
         batDauNhapMoi = true;
+        ketQuaLaCanBacHai = false;
 
         caiDatCuaSo();
         khoiTaoThanhPhan();
@@ -209,7 +211,7 @@ public class MayTinhHienDai extends JFrame {
         return panelNut;
     }
 
-      /**
+    /**
      * Xử lý sự kiện khi người dùng nhấn nút
      * @param giaTri Giá trị của nút được nhấn
      */
@@ -269,6 +271,7 @@ public class MayTinhHienDai extends JFrame {
         batDauNhapMoi = true;
         dangNhapPhanSo = false;
         dangNhapCanBacHai = false;
+        ketQuaLaCanBacHai = false;
         manHinh.capNhatBieuThuc("");
         capNhatManHinh();
     }
@@ -283,13 +286,26 @@ public class MayTinhHienDai extends JFrame {
                 duLieuNhap.append("0");
                 batDauNhapMoi = true;
             }
+            
+            // Kiểm tra nếu đã xóa hết ký tự căn bậc hai
+            if (dangNhapCanBacHai && !duLieuNhap.toString().startsWith(KyHieu.DAU_CAN)) {
+                dangNhapCanBacHai = false;
+            }
+            
             capNhatManHinh();
             
             // Cập nhật biểu thức nếu đang trong phép tính
             if (!phepToanCuoi.isEmpty()) {
                 String kyHieuPhepToan = chuyenDoiKyHieuPhepToan(phepToanCuoi);
-                manHinh.capNhatBieuThuc(PhepTinhCoBan.dinhDangSo(ketQua) + 
-                                      " " + kyHieuPhepToan + " " + duLieuNhap);
+                String hienThiBieuThuc;
+                
+                if (ketQuaLaCanBacHai) {
+                    hienThiBieuThuc = KyHieu.DAU_CAN + PhepTinhCoBan.dinhDangSo(ketQua * ketQua);
+                } else {
+                    hienThiBieuThuc = PhepTinhCoBan.dinhDangSo(ketQua);
+                }
+                
+                manHinh.capNhatBieuThuc(hienThiBieuThuc + " " + kyHieuPhepToan + " " + duLieuNhap);
             }
         }
     }
@@ -309,8 +325,15 @@ public class MayTinhHienDai extends JFrame {
         // Cập nhật biểu thức nếu đang trong phép tính
         if (!phepToanCuoi.isEmpty()) {
             String kyHieuPhepToan = chuyenDoiKyHieuPhepToan(phepToanCuoi);
-            manHinh.capNhatBieuThuc(PhepTinhCoBan.dinhDangSo(ketQua) + 
-                                  " " + kyHieuPhepToan + " " + duLieuNhap);
+            String hienThiBieuThuc;
+            
+            if (ketQuaLaCanBacHai) {
+                hienThiBieuThuc = KyHieu.DAU_CAN + PhepTinhCoBan.dinhDangSo(ketQua * ketQua);
+            } else {
+                hienThiBieuThuc = PhepTinhCoBan.dinhDangSo(ketQua);
+            }
+            
+            manHinh.capNhatBieuThuc(hienThiBieuThuc + " " + kyHieuPhepToan + " " + duLieuNhap);
         }
     }
 
@@ -351,9 +374,24 @@ public class MayTinhHienDai extends JFrame {
                 tinhToan();
             } else {
                 try {
-                    ketQua = Double.parseDouble(duLieuNhap.toString());
+                    // Xử lý trường hợp dữ liệu nhập là biểu thức căn bậc hai
+                    if (duLieuNhap.toString().startsWith(KyHieu.DAU_CAN)) {
+                        String soTrongCan = duLieuNhap.toString().substring(1);
+                        double so = Double.parseDouble(soTrongCan);
+                        if (so < 0) {
+                            throw new ArithmeticException("Không thể tính căn bậc hai của số âm");
+                        }
+                        ketQua = PhepTinhCoBan.tinhCanBacHai(so);
+                        ketQuaLaCanBacHai = true;
+                    } else {
+                        ketQua = Double.parseDouble(duLieuNhap.toString());
+                        ketQuaLaCanBacHai = false;
+                    }
                 } catch (NumberFormatException e) {
                     hienThiLoi("Dữ liệu không hợp lệ");
+                    return;
+                } catch (ArithmeticException e) {
+                    hienThiLoi(e.getMessage());
                     return;
                 }
             }
@@ -362,19 +400,35 @@ public class MayTinhHienDai extends JFrame {
         batDauNhapMoi = true;
         
         String kyHieuPhepToan = chuyenDoiKyHieuPhepToan(phepToan);
-        manHinh.capNhatBieuThuc(PhepTinhCoBan.dinhDangSo(ketQua) + 
-                               " " + kyHieuPhepToan + " ");
+        String hienThiBieuThuc;
+        
+        if (ketQuaLaCanBacHai) {
+            // Hiển thị biểu thức với căn bậc hai
+            hienThiBieuThuc = KyHieu.DAU_CAN + PhepTinhCoBan.dinhDangSo(ketQua * ketQua);
+        } else {
+            hienThiBieuThuc = PhepTinhCoBan.dinhDangSo(ketQua);
+        }
+        
+        manHinh.capNhatBieuThuc(hienThiBieuThuc + " " + kyHieuPhepToan + " ");
     }
 
     /**
      * Xử lý khi nhấn nút căn bậc hai
      */
     private void xuLyCanBacHai() {
-        if (!dangNhapCanBacHai) {
+        if (batDauNhapMoi || duLieuNhap.length() == 0) {
             dangNhapCanBacHai = true;
             duLieuNhap = new StringBuilder(KyHieu.DAU_CAN);
             batDauNhapMoi = false;
             capNhatManHinh();
+        } else {
+            // Nếu đã có dữ liệu, thêm căn bậc hai vào trước dữ liệu hiện tại
+            String giaTriHienTai = duLieuNhap.toString();
+            if (!giaTriHienTai.startsWith(KyHieu.DAU_CAN)) {
+                duLieuNhap.insert(0, KyHieu.DAU_CAN);
+                dangNhapCanBacHai = true;
+                capNhatManHinh();
+            }
         }
     }
 
@@ -408,35 +462,92 @@ public class MayTinhHienDai extends JFrame {
         if (phepToanCuoi.isEmpty()) return;
 
         try {
-            double giaTri = Double.parseDouble(duLieuNhap.toString());
-            String bieuThuc = PhepTinhCoBan.dinhDangSo(ketQua);
+            // Xử lý trường hợp dữ liệu nhập là biểu thức căn bậc hai
+            double giaTri;
+            boolean duLieuLaCanBacHai = duLieuNhap.toString().startsWith(KyHieu.DAU_CAN);
+            
+            if (duLieuLaCanBacHai) {
+                String soTrongCan = duLieuNhap.toString().substring(1);
+                double so = Double.parseDouble(soTrongCan);
+                if (so < 0) {
+                    throw new ArithmeticException("Không thể tính căn bậc hai của số âm");
+                }
+                giaTri = PhepTinhCoBan.tinhCanBacHai(so);
+            } else {
+                giaTri = Double.parseDouble(duLieuNhap.toString());
+            }
+            
+            String bieuThuc;
+            
+            // Xử lý hiển thị biểu thức dựa trên loại kết quả trước đó
+            if (ketQuaLaCanBacHai) {
+                bieuThuc = KyHieu.DAU_CAN + PhepTinhCoBan.dinhDangSo(ketQua * ketQua);
+            } else {
+                bieuThuc = PhepTinhCoBan.dinhDangSo(ketQua);
+            }
             
             // Thực hiện phép tính tương ứng
             switch (phepToanCuoi) {
                 case KyHieu.DAU_CONG: 
-                    bieuThuc += " + " + PhepTinhCoBan.dinhDangSo(giaTri);
+                    bieuThuc += " + ";
+                    if (duLieuLaCanBacHai) {
+                        bieuThuc += duLieuNhap.toString();
+                    } else {
+                        bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
+                    }
                     ketQua = PhepTinhCoBan.cong(ketQua, giaTri);
+                    ketQuaLaCanBacHai = false;
                     break;
                 case KyHieu.DAU_TRU: 
-                    bieuThuc += " - " + PhepTinhCoBan.dinhDangSo(giaTri);
+                    bieuThuc += " - ";
+                    if (duLieuLaCanBacHai) {
+                        bieuThuc += duLieuNhap.toString();
+                    } else {
+                        bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
+                    }
                     ketQua = PhepTinhCoBan.tru(ketQua, giaTri);
+                    ketQuaLaCanBacHai = false;
                     break;
                 case "*": 
-                    bieuThuc += " × " + PhepTinhCoBan.dinhDangSo(giaTri);
+                    bieuThuc += " × ";
+                    if (duLieuLaCanBacHai) {
+                        bieuThuc += duLieuNhap.toString();
+                    } else {
+                        bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
+                    }
                     ketQua = PhepTinhCoBan.nhan(ketQua, giaTri);
+                    ketQuaLaCanBacHai = false;
                     break;
                 case "/":
                     if (giaTri == 0) throw new ArithmeticException("Không thể chia cho 0");
-                    bieuThuc += " ÷ " + PhepTinhCoBan.dinhDangSo(giaTri);
+                    bieuThuc += " ÷ ";
+                    if (duLieuLaCanBacHai) {
+                        bieuThuc += duLieuNhap.toString();
+                    } else {
+                        bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
+                    }
                     ketQua = PhepTinhCoBan.chia(ketQua, giaTri);
+                    ketQuaLaCanBacHai = false;
                     break;
                 case KyHieu.DAU_PHAN_TRAM: 
-                    bieuThuc += " % " + PhepTinhCoBan.dinhDangSo(giaTri);
+                    bieuThuc += " % ";
+                    if (duLieuLaCanBacHai) {
+                        bieuThuc += duLieuNhap.toString();
+                    } else {
+                        bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
+                    }
                     ketQua = PhepTinhCoBan.tinhPhanTram(ketQua, giaTri);
+                    ketQuaLaCanBacHai = false;
                     break;
                 case "^": 
-                    bieuThuc += "ⁿ" + PhepTinhCoBan.dinhDangSo(giaTri);
+                    bieuThuc += "ⁿ";
+                    if (duLieuLaCanBacHai) {
+                        bieuThuc += duLieuNhap.toString();
+                    } else {
+                        bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
+                    }
                     ketQua = PhepTinhCoBan.tinhLuyThua(ketQua, (int)giaTri);
+                    ketQuaLaCanBacHai = false;
                     break;
             }
             
@@ -484,6 +595,7 @@ public class MayTinhHienDai extends JFrame {
             capNhatManHinh();
             dangNhapPhanSo = false;
             batDauNhapMoi = true;
+            ketQuaLaCanBacHai = false;
             
         } catch (NumberFormatException e) {
             hienThiLoi("Số không hợp lệ trong phân số");
@@ -499,6 +611,7 @@ public class MayTinhHienDai extends JFrame {
         String duLieu = duLieuNhap.toString().substring(1);
         try {
             double so = Double.parseDouble(duLieu);
+            
             if (so < 0) {
                 throw new ArithmeticException("Không thể tính căn bậc hai của số âm");
             }
@@ -508,7 +621,9 @@ public class MayTinhHienDai extends JFrame {
                             " = " + PhepTinhCoBan.dinhDangSo(ketQua);
             thanhLichSu.themLichSu(bieuThuc);
             
+            // Lưu kết quả dưới dạng căn bậc hai để sử dụng trong các phép tính tiếp theo
             duLieuNhap = new StringBuilder(PhepTinhCoBan.dinhDangSo(ketQua));
+            ketQuaLaCanBacHai = true;
             capNhatManHinh();
             dangNhapCanBacHai = false;
             batDauNhapMoi = true;
