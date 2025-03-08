@@ -25,18 +25,18 @@ public class MayTinhHienDai extends JFrame {
     private boolean batDauNhapMoi;       // Đánh dấu bắt đầu nhập số mới
     private boolean dangNhapPhanSo;      // Đánh dấu đang nhập phân số
     private boolean dangNhapCanBacHai;   // Đánh dấu đang nhập căn bậc hai
-    private boolean ketQuaLaCanBacHai;   // Đánh dấu kết quả là căn bậc hai
+    private boolean daThucHienPhepToan;  // Đánh dấu đã thực hiện phép toán
 
     /**
      * Constructor khởi tạo máy tính
      */
     public MayTinhHienDai() {
         // Khởi tạo các biến trạng thái
-        duLieuNhap = new StringBuilder();
+        duLieuNhap = new StringBuilder("0");
         ketQua = 0;
         phepToanCuoi = "";
         batDauNhapMoi = true;
-        ketQuaLaCanBacHai = false;
+        daThucHienPhepToan = false;
 
         caiDatCuaSo();
         khoiTaoThanhPhan();
@@ -271,7 +271,7 @@ public class MayTinhHienDai extends JFrame {
         batDauNhapMoi = true;
         dangNhapPhanSo = false;
         dangNhapCanBacHai = false;
-        ketQuaLaCanBacHai = false;
+        daThucHienPhepToan = false;
         manHinh.capNhatBieuThuc("");
         capNhatManHinh();
     }
@@ -297,15 +297,7 @@ public class MayTinhHienDai extends JFrame {
             // Cập nhật biểu thức nếu đang trong phép tính
             if (!phepToanCuoi.isEmpty()) {
                 String kyHieuPhepToan = chuyenDoiKyHieuPhepToan(phepToanCuoi);
-                String hienThiBieuThuc;
-                
-                if (ketQuaLaCanBacHai) {
-                    hienThiBieuThuc = KyHieu.DAU_CAN + PhepTinhCoBan.dinhDangSo(ketQua * ketQua);
-                } else {
-                    hienThiBieuThuc = PhepTinhCoBan.dinhDangSo(ketQua);
-                }
-                
-                manHinh.capNhatBieuThuc(hienThiBieuThuc + " " + kyHieuPhepToan + " " + duLieuNhap);
+                manHinh.capNhatBieuThuc(PhepTinhCoBan.dinhDangSo(ketQua) + " " + kyHieuPhepToan + " " + duLieuNhap);
             }
         }
     }
@@ -325,15 +317,7 @@ public class MayTinhHienDai extends JFrame {
         // Cập nhật biểu thức nếu đang trong phép tính
         if (!phepToanCuoi.isEmpty()) {
             String kyHieuPhepToan = chuyenDoiKyHieuPhepToan(phepToanCuoi);
-            String hienThiBieuThuc;
-            
-            if (ketQuaLaCanBacHai) {
-                hienThiBieuThuc = KyHieu.DAU_CAN + PhepTinhCoBan.dinhDangSo(ketQua * ketQua);
-            } else {
-                hienThiBieuThuc = PhepTinhCoBan.dinhDangSo(ketQua);
-            }
-            
-            manHinh.capNhatBieuThuc(hienThiBieuThuc + " " + kyHieuPhepToan + " " + duLieuNhap);
+            manHinh.capNhatBieuThuc(PhepTinhCoBan.dinhDangSo(ketQua) + " " + kyHieuPhepToan + " " + duLieuNhap);
         }
     }
 
@@ -369,66 +353,103 @@ public class MayTinhHienDai extends JFrame {
      * @param phepToan Phép toán được chọn
      */
     private void xuLyPhepToan(String phepToan) {
-        if (duLieuNhap.length() > 0) {
-            if (!phepToanCuoi.isEmpty()) {
-                tinhToan();
-            } else {
-                try {
-                    // Xử lý trường hợp dữ liệu nhập là biểu thức căn bậc hai
-                    if (duLieuNhap.toString().startsWith(KyHieu.DAU_CAN)) {
-                        String soTrongCan = duLieuNhap.toString().substring(1);
-                        double so = Double.parseDouble(soTrongCan);
-                        if (so < 0) {
-                            throw new ArithmeticException("Không thể tính căn bậc hai của số âm");
-                        }
-                        ketQua = PhepTinhCoBan.tinhCanBacHai(so);
-                        ketQuaLaCanBacHai = true;
-                    } else {
-                        ketQua = Double.parseDouble(duLieuNhap.toString());
-                        ketQuaLaCanBacHai = false;
+        // Nếu đã nhập số mới và có phép toán trước đó, thực hiện phép toán đó trước
+        if (!batDauNhapMoi && !phepToanCuoi.isEmpty() && duLieuNhap.length() > 0) {
+            tinhToanTrungGian();
+        } 
+        // Nếu chưa có phép toán nào và đã nhập số, lưu số đó làm kết quả
+        else if (phepToanCuoi.isEmpty() && duLieuNhap.length() > 0) {
+            try {
+                // Xử lý trường hợp dữ liệu nhập là biểu thức căn bậc hai
+                if (duLieuNhap.toString().startsWith(KyHieu.DAU_CAN)) {
+                    String soTrongCan = duLieuNhap.toString().substring(1);
+                    double so = Double.parseDouble(soTrongCan);
+                    if (so < 0) {
+                        throw new ArithmeticException("Không thể tính căn bậc hai của số âm");
                     }
-                } catch (NumberFormatException e) {
-                    hienThiLoi("Dữ liệu không hợp lệ");
-                    return;
-                } catch (ArithmeticException e) {
-                    hienThiLoi(e.getMessage());
-                    return;
+                    ketQua = tinhCanBacHai(so);
+                } else {
+                    ketQua = Double.parseDouble(duLieuNhap.toString());
                 }
+            } catch (NumberFormatException e) {
+                hienThiLoi("Dữ liệu không hợp lệ");
+                return;
+            } catch (ArithmeticException e) {
+                hienThiLoi(e.getMessage());
+                return;
             }
         }
+        
+        // Cập nhật phép toán mới
         phepToanCuoi = phepToan;
         batDauNhapMoi = true;
         
+        // Hiển thị biểu thức với phép toán mới
         String kyHieuPhepToan = chuyenDoiKyHieuPhepToan(phepToan);
-        String hienThiBieuThuc;
-        
-        if (ketQuaLaCanBacHai) {
-            // Hiển thị biểu thức với căn bậc hai
-            hienThiBieuThuc = KyHieu.DAU_CAN + PhepTinhCoBan.dinhDangSo(ketQua * ketQua);
-        } else {
-            hienThiBieuThuc = PhepTinhCoBan.dinhDangSo(ketQua);
+        manHinh.capNhatBieuThuc(PhepTinhCoBan.dinhDangSo(ketQua) + " " + kyHieuPhepToan + " ");
+    }
+
+    /**
+     * Thực hiện tính toán trung gian khi nhấn phép toán mới
+     */
+    private void tinhToanTrungGian() {
+        try {
+            double giaTri;
+            
+            // Xử lý trường hợp dữ liệu nhập là biểu thức căn bậc hai
+            if (duLieuNhap.toString().startsWith(KyHieu.DAU_CAN)) {
+                String soTrongCan = duLieuNhap.toString().substring(1);
+                double so = Double.parseDouble(soTrongCan);
+                if (so < 0) {
+                    throw new ArithmeticException("Không thể tính căn bậc hai của số âm");
+                }
+                giaTri = tinhCanBacHai(so);
+            } else {
+                giaTri = Double.parseDouble(duLieuNhap.toString());
+            }
+            
+            // Thực hiện phép tính tương ứng
+            switch (phepToanCuoi) {
+                case KyHieu.DAU_CONG: 
+                    ketQua = ketQua + giaTri;
+                    break;
+                case KyHieu.DAU_TRU: 
+                    ketQua = ketQua - giaTri;
+                    break;
+                case "*": 
+                    ketQua = ketQua * giaTri;
+                    break;
+                case "/":
+                    if (giaTri == 0) throw new ArithmeticException("Không thể chia cho 0");
+                    ketQua = ketQua / giaTri;
+                    break;
+                case KyHieu.DAU_PHAN_TRAM: 
+                    ketQua = ketQua * giaTri / 100;
+                    break;
+                case "^": 
+                    ketQua = Math.pow(ketQua, giaTri);
+                    break;
+            }
+            
+            // Cập nhật trạng thái
+            daThucHienPhepToan = true;
+            
+        } catch (NumberFormatException e) {
+            hienThiLoi("Dữ liệu không hợp lệ");
+        } catch (ArithmeticException e) {
+            hienThiLoi(e.getMessage());
         }
-        
-        manHinh.capNhatBieuThuc(hienThiBieuThuc + " " + kyHieuPhepToan + " ");
     }
 
     /**
      * Xử lý khi nhấn nút căn bậc hai
      */
     private void xuLyCanBacHai() {
-        if (batDauNhapMoi || duLieuNhap.length() == 0) {
+        if (!dangNhapCanBacHai) {
             dangNhapCanBacHai = true;
             duLieuNhap = new StringBuilder(KyHieu.DAU_CAN);
             batDauNhapMoi = false;
             capNhatManHinh();
-        } else {
-            // Nếu đã có dữ liệu, thêm căn bậc hai vào trước dữ liệu hiện tại
-            String giaTriHienTai = duLieuNhap.toString();
-            if (!giaTriHienTai.startsWith(KyHieu.DAU_CAN)) {
-                duLieuNhap.insert(0, KyHieu.DAU_CAN);
-                dangNhapCanBacHai = true;
-                capNhatManHinh();
-            }
         }
     }
 
@@ -454,12 +475,12 @@ public class MayTinhHienDai extends JFrame {
             tinhPhanSo();
             return;
         }
-        if (dangNhapCanBacHai) {
+        if (dangNhapCanBacHai && duLieuNhap.toString().startsWith(KyHieu.DAU_CAN)) {
             tinhCanBacHai();
             return;
         }
         
-        if (phepToanCuoi.isEmpty()) return;
+        if (phepToanCuoi.isEmpty() || batDauNhapMoi) return;
 
         try {
             // Xử lý trường hợp dữ liệu nhập là biểu thức căn bậc hai
@@ -472,19 +493,12 @@ public class MayTinhHienDai extends JFrame {
                 if (so < 0) {
                     throw new ArithmeticException("Không thể tính căn bậc hai của số âm");
                 }
-                giaTri = PhepTinhCoBan.tinhCanBacHai(so);
+                giaTri = tinhCanBacHai(so);
             } else {
                 giaTri = Double.parseDouble(duLieuNhap.toString());
             }
             
-            String bieuThuc;
-            
-            // Xử lý hiển thị biểu thức dựa trên loại kết quả trước đó
-            if (ketQuaLaCanBacHai) {
-                bieuThuc = KyHieu.DAU_CAN + PhepTinhCoBan.dinhDangSo(ketQua * ketQua);
-            } else {
-                bieuThuc = PhepTinhCoBan.dinhDangSo(ketQua);
-            }
+            String bieuThuc = PhepTinhCoBan.dinhDangSo(ketQua);
             
             // Thực hiện phép tính tương ứng
             switch (phepToanCuoi) {
@@ -495,8 +509,7 @@ public class MayTinhHienDai extends JFrame {
                     } else {
                         bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
                     }
-                    ketQua = PhepTinhCoBan.cong(ketQua, giaTri);
-                    ketQuaLaCanBacHai = false;
+                    ketQua = ketQua + giaTri;
                     break;
                 case KyHieu.DAU_TRU: 
                     bieuThuc += " - ";
@@ -505,8 +518,7 @@ public class MayTinhHienDai extends JFrame {
                     } else {
                         bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
                     }
-                    ketQua = PhepTinhCoBan.tru(ketQua, giaTri);
-                    ketQuaLaCanBacHai = false;
+                    ketQua = ketQua - giaTri;
                     break;
                 case "*": 
                     bieuThuc += " × ";
@@ -515,8 +527,7 @@ public class MayTinhHienDai extends JFrame {
                     } else {
                         bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
                     }
-                    ketQua = PhepTinhCoBan.nhan(ketQua, giaTri);
-                    ketQuaLaCanBacHai = false;
+                    ketQua = ketQua * giaTri;
                     break;
                 case "/":
                     if (giaTri == 0) throw new ArithmeticException("Không thể chia cho 0");
@@ -526,8 +537,7 @@ public class MayTinhHienDai extends JFrame {
                     } else {
                         bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
                     }
-                    ketQua = PhepTinhCoBan.chia(ketQua, giaTri);
-                    ketQuaLaCanBacHai = false;
+                    ketQua = ketQua / giaTri;
                     break;
                 case KyHieu.DAU_PHAN_TRAM: 
                     bieuThuc += " % ";
@@ -536,8 +546,7 @@ public class MayTinhHienDai extends JFrame {
                     } else {
                         bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
                     }
-                    ketQua = PhepTinhCoBan.tinhPhanTram(ketQua, giaTri);
-                    ketQuaLaCanBacHai = false;
+                    ketQua = ketQua * giaTri / 100;
                     break;
                 case "^": 
                     bieuThuc += "ⁿ";
@@ -546,8 +555,7 @@ public class MayTinhHienDai extends JFrame {
                     } else {
                         bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
                     }
-                    ketQua = PhepTinhCoBan.tinhLuyThua(ketQua, (int)giaTri);
-                    ketQuaLaCanBacHai = false;
+                    ketQua = Math.pow(ketQua, giaTri);
                     break;
             }
             
@@ -559,6 +567,7 @@ public class MayTinhHienDai extends JFrame {
             capNhatManHinh();
             phepToanCuoi = "";
             batDauNhapMoi = true;
+            daThucHienPhepToan = false;
             
         } catch (NumberFormatException e) {
             hienThiLoi("Dữ liệu không hợp lệ");
@@ -586,7 +595,7 @@ public class MayTinhHienDai extends JFrame {
                 throw new ArithmeticException("Không thể chia cho 0");
             }
             
-            ketQua = PhepTinhCoBan.chia(tuSo, mauSo);
+            ketQua = tuSo / mauSo;
             String bieuThuc = phanTu[0] + KyHieu.DAU_PHAN_SO + phanTu[1] + 
                             " = " + PhepTinhCoBan.dinhDangSo(ketQua);
             thanhLichSu.themLichSu(bieuThuc);
@@ -595,7 +604,6 @@ public class MayTinhHienDai extends JFrame {
             capNhatManHinh();
             dangNhapPhanSo = false;
             batDauNhapMoi = true;
-            ketQuaLaCanBacHai = false;
             
         } catch (NumberFormatException e) {
             hienThiLoi("Số không hợp lệ trong phân số");
@@ -616,14 +624,12 @@ public class MayTinhHienDai extends JFrame {
                 throw new ArithmeticException("Không thể tính căn bậc hai của số âm");
             }
             
-            ketQua = PhepTinhCoBan.tinhCanBacHai(so);
+            ketQua = tinhCanBacHai(so);
             String bieuThuc = KyHieu.DAU_CAN + PhepTinhCoBan.dinhDangSo(so) + 
                             " = " + PhepTinhCoBan.dinhDangSo(ketQua);
             thanhLichSu.themLichSu(bieuThuc);
             
-            // Lưu kết quả dưới dạng căn bậc hai để sử dụng trong các phép tính tiếp theo
             duLieuNhap = new StringBuilder(PhepTinhCoBan.dinhDangSo(ketQua));
-            ketQuaLaCanBacHai = true;
             capNhatManHinh();
             dangNhapCanBacHai = false;
             batDauNhapMoi = true;
@@ -633,6 +639,25 @@ public class MayTinhHienDai extends JFrame {
         } catch (ArithmeticException e) {
             hienThiLoi(e.getMessage());
         }
+    }
+
+    /**
+     * Tính căn bậc hai của một số sử dụng phương pháp Newton-Raphson
+     * @param x Số cần tính căn bậc hai
+     * @return Căn bậc hai của x
+     */
+    private double tinhCanBacHai(double x) {
+        if (x == 0) return 0;
+        
+        double epsilon = 1e-10; // Độ chính xác
+        double t = x;           // Giá trị ban đầu
+        
+        // Lặp cho đến khi đạt độ chính xác mong muốn
+        while (Math.abs(t - x/t) > epsilon * t) {
+            t = (t + x/t) / 2.0;
+        }
+        
+        return t;
     }
 
     /**

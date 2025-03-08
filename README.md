@@ -1,3 +1,8 @@
+lệnh chạy code:
+ ```javac -d out src/com/calculator/**/*.java```
+ ```java -cp out com.calculator.MayTinhHienDai```
+
+link github: https://github.com/Datkoishi/MayTinhJAVA
 ### Giao diện chính
 <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/A%CC%89nh%20ma%CC%80n%20hi%CC%80nh%202025-03-02%20lu%CC%81c%2003.40.06-iCcpNSo1QwAmCfIjS3nUbCJlVX809i.png" alt="Calculator Main" width="320"/>
 ```markdown
