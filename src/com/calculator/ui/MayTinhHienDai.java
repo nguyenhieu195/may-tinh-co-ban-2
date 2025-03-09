@@ -424,7 +424,8 @@ public class MayTinhHienDai extends JFrame {
                     ketQua = ketQua / giaTri;
                     break;
                 case KyHieu.DAU_PHAN_TRAM: 
-                    ketQua = ketQua * giaTri / 100;
+                    // Sửa lại cách tính phần trăm: tính giaTri% của ketQua
+                    ketQua = ketQua * (giaTri / 100.0);
                     break;
                 case "^": 
                     ketQua = Math.pow(ketQua, giaTri);
@@ -546,7 +547,8 @@ public class MayTinhHienDai extends JFrame {
                     } else {
                         bieuThuc += PhepTinhCoBan.dinhDangSo(giaTri);
                     }
-                    ketQua = ketQua * giaTri / 100;
+                    // Sửa lại cách tính phần trăm: tính giaTri% của ketQua
+                    ketQua = ketQua * (giaTri / 100.0);
                     break;
                 case "^": 
                     bieuThuc += "ⁿ";
