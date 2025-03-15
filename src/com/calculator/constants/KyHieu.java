@@ -37,5 +37,5 @@ public class KyHieu {
     /** Ký hiệu đóng ngoặc */
     public static final String DAU_DONG_NGOAC = ")";
     /** Ký hiệu xóa tất cả */
-    public static final String XOA_TAT_CA = "C";
+    public static final String XOA_TAT_CA = "C";//hihi
 }
