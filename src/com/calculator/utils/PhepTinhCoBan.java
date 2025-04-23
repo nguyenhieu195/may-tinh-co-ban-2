@@ -125,5 +125,65 @@ public class PhepTinhCoBan {
         return String.format("%.8g", so);
     }
 
-    
+    // Chuyển radian sang độ
+    public static double radianSangDo(double rad) {
+        return Math.toDegrees(rad);
+    }
+
+    // Chuyển độ sang radian
+    public static double doSangRadian(double doGoc) {
+        return Math.toRadians(doGoc);
+    }
+
+    // Hàm sin (đầu vào là độ)
+    public static double sin(double doGoc) {
+        return Math.sin(Math.toRadians(doGoc));
+    }
+
+    // Hàm cos (đầu vào là độ)
+    public static double cos(double doGoc) {
+        return Math.cos(Math.toRadians(doGoc));
+    }
+
+    // Hàm tan (đầu vào là độ)
+    public static double tan(double doGoc) {
+        return Math.tan(Math.toRadians(doGoc));
+    }
+
+    // Hàm cot (đầu vào là độ)
+    public static double cot(double doGoc) {
+        double tan = Math.tan(Math.toRadians(doGoc));
+        if (tan == 0) {
+            throw new ArithmeticException("Không tính được cot của góc này");
+        }
+        return 1.0 / tan;
+    }
+
+    // Tính giai thừa (n!)
+    public static long tinhGiaiThua(int n) {
+        if (n < 0) {
+            throw new IllegalArgumentException("n phải >= 0");
+        }
+        long ketQua = 1;
+        for (int i = 2; i <= n; i++) {
+            ketQua *= i;
+        }
+        return ketQua;
+    }
+
+    // Log tự nhiên (ln)
+    public static double logTuNhien(double x) {
+        if (x <= 0) {
+            throw new ArithmeticException("Giá trị log phải lớn hơn 0");
+        }
+        return Math.log(x);
+    }
+
+    // Log cơ số 10
+    public static double logCoSo10(double x) {
+        if (x <= 0) {
+            throw new ArithmeticException("Giá trị log phải lớn hơn 0");
+        }
+        return Math.log10(x);
+    }
 }
