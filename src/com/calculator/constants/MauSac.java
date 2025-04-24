@@ -1,5 +1,4 @@
 package com.calculator.constants;
-
 import java.awt.Color;
 
 /**
