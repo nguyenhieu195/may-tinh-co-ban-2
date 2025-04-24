@@ -1,5 +1,4 @@
 package com.calculator.constants;
-
 /**
  * Lớp chứa các hằng số ký hiệu được sử dụng trong máy tính
  * Giúp quản lý tập trung các ký hiệu và dễ dàng thay đổi nếu cần
