@@ -1,9 +1,12 @@
 package com.calculator.constants;
+
 /**
  * Lớp chứa các hằng số ký hiệu được sử dụng trong máy tính
  * Giúp quản lý tập trung các ký hiệu và dễ dàng thay đổi nếu cần
  */
+
 public class KyHieu {
+    
     // Các ký hiệu toán học cơ bản
     /** Ký hiệu phép cộng */
     public static final String DAU_CONG = "+";
@@ -15,6 +18,7 @@ public class KyHieu {
     public static final String DAU_CHIA = "÷";
     /** Ký hiệu dấu bằng */
     public static final String DAU_BANG = "=";
+
     
     // Các ký hiệu toán học đặc biệt
     /** Ký hiệu căn bậc hai */
@@ -25,6 +29,7 @@ public class KyHieu {
     public static final String DAU_MU = "^";
     /** Ký hiệu phần trăm */
     public static final String DAU_PHAN_TRAM = "%";
+
     
     // Các ký hiệu khác
     /** Ký hiệu nút xóa */
@@ -37,4 +42,5 @@ public class KyHieu {
     public static final String DAU_DONG_NGOAC = ")";
     /** Ký hiệu xóa tất cả */
     public static final String XOA_TAT_CA = "C";//hihi
+    
 }
