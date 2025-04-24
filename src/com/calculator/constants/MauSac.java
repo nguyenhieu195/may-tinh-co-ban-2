@@ -12,7 +12,6 @@ public class MauSac {
     public static final Color NEN_MAN_HINH = new Color(22, 31, 50);  // Xanh tím nhạt
     /** Màu nền của phần lịch sử */
     public static final Color NEN_LICH_SU = new Color(30, 41, 59);  // Xanh tím
-    
     // Màu nút
     /** Màu nút số */
     public static final Color NUT_SO = new Color(51, 65, 85);       // Xanh xám
