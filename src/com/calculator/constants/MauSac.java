@@ -1,6 +1,5 @@
 package com.calculator.constants;
 import java.awt.Color;
-
 /**
  * Lớp chứa các hằng số màu sắc được sử dụng trong giao diện máy tính
  * Giúp duy trì tính nhất quán về màu sắc trong toàn bộ ứng dụng
